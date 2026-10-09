@@ -1,0 +1,275 @@
+<title>Apple MDM Rollout Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,600&display=swap">
+<style>
+/* Layout: single reading column, decision picker first, then reference tables and a rollout checklist. */
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --fg:#14181f; --muted:#5a6472; --line:#dde1e8;
+  --accent:#0a5fd6; --accent-soft:#e6efff; --ok:#14733a; --ok-soft:#e2f4e8;
+  --warn:#9a5b00; --warn-soft:#fff0d6; --bad:#b3261e; --bad-soft:#fde8e6;
+  --display:"Fraunces",Georgia,serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1319; --surface:#171c24; --fg:#e8ebf0; --muted:#9aa4b2; --line:#2a313c;
+  --accent:#6aa5ff; --accent-soft:#16263f; --ok:#5fd18b; --ok-soft:#12301f;
+  --warn:#f0b35a; --warn-soft:#352610; --bad:#ff8a80; --bad-soft:#3a1816; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1319; --surface:#171c24; --fg:#e8ebf0; --muted:#9aa4b2; --line:#2a313c;
+  --accent:#6aa5ff; --accent-soft:#16263f; --ok:#5fd18b; --ok-soft:#12301f;
+  --warn:#f0b35a; --warn-soft:#352610; --bad:#ff8a80; --bad-soft:#3a1816; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:32px 64px}
+*{box-sizing:border-box}
+main{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+h1,h2,h3{text-wrap:balance;margin:0}
+h1{font-family:var(--display);font-size:clamp(28px,5vw,40px);line-height:1.15;font-weight:600}
+h2{font-family:var(--display);font-size:22px;font-weight:600}
+h3{font-size:15px;font-weight:600}
+p{margin:0}
+.lede{color:var(--muted);max-width:65ch;margin-top:10px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+section{display:flex;flex-direction:column;gap:16px;min-width:0}
+.sub{color:var(--muted);max-width:65ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.chip{display:inline-block;font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.warn{background:var(--warn-soft);color:var(--warn)} .chip.bad{background:var(--bad-soft);color:var(--bad)}
+.alert{border:1px solid var(--warn);background:var(--warn-soft);color:var(--fg);border-radius:10px;padding:14px 16px;display:flex;gap:12px;flex-wrap:wrap;align-items:baseline}
+.alert strong{color:var(--warn)}
+.picker{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.picker button{font:inherit;text-align:left;padding:12px 14px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:8px;cursor:pointer}
+.picker button small{display:block;color:var(--muted);margin-top:2px}
+.picker button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+button:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.result{display:flex;flex-direction:column;gap:14px}
+.result h3{font-size:18px}
+dl.facts{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;margin:0}
+dl.facts dt{color:var(--muted)} dl.facts dd{margin:0}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;background:var(--bg);font-size:13px}
+tr:last-child td{border-bottom:0}
+td.c{text-align:center}
+.cfg{display:flex;flex-direction:column;gap:8px}
+.cfg header{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.cfg .plat{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.cfg ul{margin:0;padding-left:18px;color:var(--muted)}
+.checks{display:flex;flex-direction:column;gap:0;padding:0}
+.checks h3{padding:14px 20px 8px;font-size:13px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.checks label{display:flex;gap:12px;align-items:flex-start;padding:10px 20px;border-top:1px solid var(--line);cursor:pointer}
+.checks input{margin-top:4px;width:16px;height:16px;flex:none;accent-color:var(--accent)}
+.checks input:checked+span{color:var(--muted);text-decoration:line-through}
+.progress{display:flex;align-items:center;gap:12px}
+.bar{flex:1;height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+details{border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+summary{padding:14px 18px;cursor:pointer;font-weight:500}
+details .body{padding:0 18px 16px;color:var(--muted)}
+details ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+code{font-family:var(--mono);font-size:13px}
+.foot{color:var(--muted);font-size:13px}
+@media (max-width:520px){dl.facts{grid-template-columns:1fr}dl.facts dt{margin-top:6px}}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<main>
+  <header>
+    <div class="eyebrow">Ultralytics Inc. · Apple Business · Built-In Management</div>
+    <h1>Apple MDM rollout plan</h1>
+    <p class="lede">Which enrolment method fits each kind of device, how your four configurations map onto them, and what to do before you assign the blueprints. Method details come from Apple's Business guide on enrolment (updated 14 Apr 2026). Your configurations come from the console as it stands on 9 Oct 2026.</p>
+  </header>
+
+  <div class="alert" role="note">
+    <strong>Blocker for FileVault</strong>
+    <span>The FileVault Enforced configuration shows "Encryption certificate is not uploaded". It will not apply to any Mac until you upload one under Devices &gt; Management Services &gt; Built-In Device Management Server. Apple Business also lists one item awaiting review in Activity.</span>
+  </div>
+
+  <section aria-labelledby="pick">
+    <h2 id="pick">Which enrolment method?</h2>
+    <p class="sub">Pick the situation. The result lists the method, what Apple says it gives you, and how your four configurations are expected to behave.</p>
+    <div class="picker" id="picker" role="group" aria-label="Device situation"></div>
+    <div class="panel result" id="result" aria-live="polite"></div>
+  </section>
+
+  <section aria-labelledby="methods">
+    <h2 id="methods">The four methods side by side</h2>
+    <div class="scroll"><table>
+      <thead><tr><th></th><th>Account-driven User Enrolment</th><th>Account-driven Device Enrolment</th><th>Automated (user or group Blueprint)</th><th>Automated (device Blueprint)</th></tr></thead>
+      <tbody>
+        <tr><th>Best for</th><td>Personal devices (BYOD)</td><td>Company devices already in use</td><td>New or erased company devices</td><td>Shared or single-purpose devices</td></tr>
+        <tr><th>Blueprint assigned to</th><td>User or group</td><td>User or group</td><td>User or group</td><td>Device serial number</td></tr>
+        <tr><th>Managed Apple Account</th><td>Required</td><td>Required, plus a personal Apple Account</td><td>Required, only iCloud account</td><td>Not required</td></tr>
+        <tr><th>Supervised</th><td>No</td><td>Mac yes. iPhone, iPad, Vision Pro no</td><td>Yes</td><td>Yes</td></tr>
+        <tr><th>Work and personal data separated</th><td>Yes</td><td>Yes</td><td>No</td><td>No</td></tr>
+        <tr><th>Needs erase</th><td>No</td><td>No</td><td>Yes, unless new</td><td>Yes, unless new</td></tr>
+        <tr><th>Minimum OS</th><td>iOS / iPadOS 15, macOS 14, visionOS 26.4</td><td>iOS / iPadOS 17, macOS 14 (article also cites 17.1 and 14.1)</td><td>iOS / iPadOS 15, macOS 12.0.1, visionOS 26.4 (beta feature)</td><td>Same as automated, plus tvOS 15. Needs an approved device subscription</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section aria-labelledby="cfgs">
+    <h2 id="cfgs">Your four configurations</h2>
+    <p class="sub">Each one currently has 1 blueprint assigned, all created 5 Oct 2026 by Kristian Sommer. The settings tab was not in the screenshots, so only the overview details are listed.</p>
+    <div class="grid">
+      <article class="panel cfg">
+        <header><h3>Auth Configuration (passwords)</h3><span class="chip ok">Ready</span></header>
+        <div class="plat">iOS · macOS · visionOS</div>
+        <p class="sub">Password rules, Auto Unlock, smart cards and screen unlock.</p>
+      </article>
+      <article class="panel cfg">
+        <header><h3>FileVault Enforced</h3><span class="chip bad">Needs certificate</span></header>
+        <div class="plat">macOS</div>
+        <p class="sub">Full-disk encryption on Macs. Not applied until the encryption certificate is uploaded.</p>
+      </article>
+      <article class="panel cfg">
+        <header><h3>Lock Screen Controls</h3><span class="chip ok">Ready</span></header>
+        <div class="plat">iOS · macOS</div>
+        <p class="sub">Lock Screen presentation, features and user sessions.</p>
+      </article>
+      <article class="panel cfg">
+        <header><h3>Software Update Settings</h3><span class="chip ok">Ready</span></header>
+        <div class="plat">iOS · iPadOS · macOS · visionOS</div>
+        <ul>
+          <li>Major upgrades: 7-day delay, then 14 days to install</li>
+          <li>Minor updates: 7 days to install</li>
+          <li>Enforced at 22:00 device local time</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="matrix">
+    <h2 id="matrix">What to expect per method</h2>
+    <p class="sub">Platform coverage is read from your console. The per-method columns are my own inference from the supervision rules in the article, not something Apple states for each setting. Confirm each cell in the pilot before you rely on it.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Configuration</th><th>User Enrolment (BYOD)</th><th>Account-driven Device</th><th>Automated Enrolment</th></tr></thead>
+      <tbody>
+        <tr><th>Auth (passwords)</th><td><span class="chip warn">Verify</span></td><td><span class="chip ok">Expected</span></td><td><span class="chip ok">Expected</span></td></tr>
+        <tr><th>FileVault Enforced</th><td><span class="chip warn">Verify</span> Mac is unsupervised</td><td><span class="chip ok">Expected</span> Mac only</td><td><span class="chip ok">Expected</span> Mac only</td></tr>
+        <tr><th>Lock Screen Controls</th><td><span class="chip warn">Verify</span></td><td><span class="chip warn">Verify</span> iPhone and iPad are unsupervised</td><td><span class="chip ok">Expected</span></td></tr>
+        <tr><th>Software Update Settings</th><td><span class="chip warn">Verify</span></td><td><span class="chip warn">Verify</span> iPhone and iPad are unsupervised</td><td><span class="chip ok">Expected</span></td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section aria-labelledby="plan">
+    <h2 id="plan">Rollout checklist</h2>
+    <div class="progress"><div class="bar"><i id="barfill"></i></div><span id="pct" class="chip">0 of 0</span></div>
+    <div class="panel checks" id="checks"></div>
+    <p class="foot">Ticks are saved in this browser only.</p>
+  </section>
+
+  <section aria-labelledby="steps">
+    <h2 id="steps">Setup steps from Apple</h2>
+    <details><summary>Turn on account-driven enrolment (User or Device)</summary><div class="body"><ol>
+      <li>Sign in to Apple Business with a role that can manage devices.</li>
+      <li>Go to Devices &gt; Management Services, then the Device Enrollment tab.</li>
+      <li>Choose "Enrol as personal device" for User Enrolment, or "Enrol as organization-owned device" for Device Enrolment, for each device type.</li>
+    </ol></div></details>
+    <details><summary>Set up Automated Device Enrolment (user or group Blueprint)</summary><div class="body"><ol>
+      <li>Link your Apple Customer Number or Reseller Number under device suppliers.</li>
+      <li>Assign each device to the Apple Business device management service. If it does not appear, add it with Apple Configurator.</li>
+      <li>Keep devices powered on and online. The user completes Setup Assistant on iPhone, iPad and Mac. Apple TV finishes on its own.</li>
+      <li>The user signs in with their Managed Apple Account.</li>
+    </ol></div></details>
+    <details><summary>Approve devices enrolled with a device Blueprint</summary><div class="body"><ol>
+      <li>A role that can purchase subscriptions must approve each device. Tick "Approve recently added devices for management without manual review" when confirming the Blueprint to do this up front, for devices never approved before.</li>
+      <li>Otherwise go to Devices &gt; Inventory and select the device. You can paste up to 1,024 comma-separated serial numbers to search.</li>
+      <li>Check the enrolment date, OS and certificate fingerprint (SHA-256). On Mac it is in Keychain &gt; Certificates &gt; Systems. On iOS it is in Settings &gt; your account &gt; More Details &gt; Device Identity Certificate.</li>
+      <li>Approve if it matches. Deny if not, which removes the enrolment profile.</li>
+    </ol></div></details>
+    <details><summary>Send enrolment instructions to users</summary><div class="body"><ol>
+      <li>Sign in with a role that can create, edit and delete Managed Apple Accounts.</li>
+      <li>Go to People &gt; Users. For one user, select them and choose Enrol Devices. For several, select them and choose Send Device Enrolment Instructions.</li>
+      <li>Choose Mac or iPhone / iPad / Apple Vision Pro instructions and select Send. Users follow the link in the email.</li>
+    </ol></div></details>
+    <p class="foot">After enrolment the Apple Business app installs on iPhone, iPad, Mac and Vision Pro (not Apple TV). Users get assigned work apps, a list of their managed devices and AppleCare+ for Business support. Devices seven years past introduction may work but are not supported for Automated Device Enrolment.</p>
+  </section>
+</main>
+
+<script>
+(function(){
+  var SITUATIONS=[
+    {id:"byod",label:"Personal device",hint:"Employee-owned phone or Mac",
+     method:"Account-driven User Enrolment",assign:"User or user group",
+     gets:"Data separation, unmanaged personal iCloud storage, optional organization iCloud storage. No supervision.",
+     os:"iOS / iPadOS 15, macOS 14, visionOS 26.4",
+     steps:"Enable \"Enrol as personal device\" under Management Services, then send enrolment instructions.",
+     notes:["IT control is limited to the Managed Apple Account and managed apps.","Anything that needs supervision on iPhone or iPad must use Automated Device Enrolment instead.","Expect Lock Screen, FileVault and update enforcement to be restricted. Test each before promising it."]},
+    {id:"inuse",label:"Company device in use",hint:"Already set up, no wipe wanted",
+     method:"Account-driven Device Enrolment",assign:"User or user group",
+     gets:"Data separation. The user keeps a personal Apple Account next to the Managed Apple Account. Macs are supervised, iPhone, iPad and Vision Pro are not.",
+     os:"iOS / iPadOS 17, macOS 14 (older versions fall back to User Enrolment)",
+     steps:"Enable \"Enrol as organization-owned device\" under Management Services, then send enrolment instructions.",
+     notes:["Good fit for existing Macs, since they end up supervised and FileVault applies.","iPhones and iPads stay unsupervised, so test Lock Screen and update settings there."]},
+    {id:"new",label:"New or erased company device",hint:"Dedicated to work",
+     method:"Automated Device Enrolment (user or group Blueprint)",assign:"User or user group",
+     gets:"Full supervision. The Managed Apple Account becomes the only iCloud account. No data separation.",
+     os:"iOS / iPadOS 15, macOS 12.0.1, visionOS 26.4 (beta feature)",
+     steps:"Link your Apple Customer or Reseller Number, assign devices to the management service, then the user signs in with their Managed Apple Account in Setup Assistant.",
+     notes:["Strongest control, so all four of your configurations should apply in full.","Personal Apple Accounts are not allowed during Setup Assistant."]},
+    {id:"shared",label:"Shared or single-purpose",hint:"Kiosk, lab, Apple TV",
+     method:"Automated Device Enrolment (device Blueprint)",assign:"Device serial number",
+     gets:"Supervision with no Managed Apple Account required. No data separation.",
+     os:"Same as Automated, plus tvOS 15",
+     steps:"Same supplier and assignment steps, then approve the device subscription before it can be managed.",
+     notes:["Needs a device subscription approved by a role that can purchase subscriptions.","Auth (passwords) is aimed at people signing in, so it may matter less here."]}
+  ];
+  var CHECKS=[
+    {g:"Before anything else",items:[
+      "Upload the encryption certificate for FileVault (Management Services > Built-In Device Management Server)",
+      "Review the item waiting in Activity",
+      "Open the Configuration tab of each of the four configurations and record the exact settings",
+      "Link Apple Customer Number or Reseller Number under device suppliers"]},
+    {g:"Pilot",items:[
+      "Pick 2 to 3 people with a Mac and an iPhone",
+      "Enrol one Mac through Automated Device Enrolment and confirm FileVault, Lock Screen and Auth apply",
+      "Enrol one existing company Mac through Account-driven Device Enrolment",
+      "Enrol one personal iPhone through User Enrolment and note which settings do not apply",
+      "Watch a minor update run through the 7-day window and the 22:00 enforcement"]},
+    {g:"Rollout",items:[
+      "Enable the enrolment types you need under Management Services > Device Enrollment",
+      "Assign blueprints to users or groups (serial numbers for shared devices)",
+      "Send enrolment instructions from People > Users, in small batches",
+      "Approve any device-subscription devices in Inventory after checking the fingerprint",
+      "Tell users about the 22:00 update deadline and the Apple Business app"]}
+  ];
+  var KEY="apple-mdm-checks-v1";
+  function load(){try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){return {}}}
+  function save(s){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
+  function esc(t){var d=document.createElement("div");d.textContent=t;return d.innerHTML}
+
+  var picker=document.getElementById("picker"),result=document.getElementById("result");
+  function show(id){
+    var s=SITUATIONS.filter(function(x){return x.id===id})[0];
+    Array.prototype.forEach.call(picker.children,function(b){b.setAttribute("aria-pressed",b.dataset.id===id)});
+    result.innerHTML='<span class="eyebrow">Recommended</span><h3>'+esc(s.method)+'</h3>'+
+      '<dl class="facts"><dt>Assign blueprint to</dt><dd>'+esc(s.assign)+'</dd><dt>You get</dt><dd>'+esc(s.gets)+'</dd><dt>Minimum OS</dt><dd>'+esc(s.os)+'</dd><dt>Set up</dt><dd>'+esc(s.steps)+'</dd></dl>'+
+      '<ul style="margin:0;padding-left:18px;color:var(--muted)">'+s.notes.map(function(n){return"<li>"+esc(n)+"</li>"}).join("")+"</ul>";
+  }
+  SITUATIONS.forEach(function(s){
+    var b=document.createElement("button");b.type="button";b.dataset.id=s.id;
+    b.innerHTML=esc(s.label)+"<small>"+esc(s.hint)+"</small>";
+    b.addEventListener("click",function(){show(s.id)});picker.appendChild(b);
+  });
+  show("new");
+
+  var state=load(),box=document.getElementById("checks"),n=0;
+  CHECKS.forEach(function(grp){
+    var h=document.createElement("h3");h.textContent=grp.g;box.appendChild(h);
+    grp.items.forEach(function(t){
+      var id="c"+(n++),l=document.createElement("label");
+      l.innerHTML='<input type="checkbox" id="'+id+'"><span>'+esc(t)+"</span>";
+      var i=l.firstChild;i.checked=!!state[t];
+      i.addEventListener("change",function(){state[t]=i.checked;save(state);update()});
+      box.appendChild(l);
+    });
+  });
+  function update(){
+    var all=box.querySelectorAll("input"),done=box.querySelectorAll("input:checked").length;
+    document.getElementById("pct").textContent=done+" of "+all.length;
+    document.getElementById("barfill").style.width=(all.length?done/all.length*100:0)+"%";
+  }
+  update();
+})();
+</script>
