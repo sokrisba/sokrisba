@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: methodology-note-for-finance
+expected_outcome: |
+  A one-page markdown note that explains the three lenses (adoption,
+  intensity, breadth), why tokens alone mislead (seat products are not
+  token-billed; token maxing), that usage is input and productivity needs a
+  separate team-level output measure, that the baseline comes from GitHub
+  (PRs merged, cycle time) and HubSpot (deals), and that measured tasks cover
+  only part of a role so results must not be stretched.

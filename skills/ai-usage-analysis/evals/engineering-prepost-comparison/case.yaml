@@ -1,0 +1,12 @@
+schema_version: "1.1"
+name: engineering-prepost-comparison
+expected_outcome: |
+  A team-level before/after comparison with a cutover derived from the seat
+  grant dates (around 2026-03-01, when most of the team held a seat), equal
+  windows on each side, throughput per person-month and median cycle time,
+  the number of people in each window, the new joiner (ravi) handled rather
+  than silently counted as pre-AI zero, and an explicit statement that the
+  result is an association with named confounders and that PR metrics cover
+  only part of an engineer's role.
+context:
+  scaffold_script: place-files.sh

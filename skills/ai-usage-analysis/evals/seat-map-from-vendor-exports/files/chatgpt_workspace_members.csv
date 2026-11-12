@@ -1,0 +1,10 @@
+email,role,last_active_at,messages_30d,active_days_30d
+gus@acme.example,member,2026-11-11,140,17
+hana@acme.example,member,2026-11-11,210,21
+jo@acme.example,member,2026-10-15,6,2
+kim@acme.example,member,2026-11-09,60,12
+lee@acme.example,member,2026-11-11,180,19
+mia@acme.example,member,2026-11-10,22,6
+noa@acme.example,owner,2026-11-07,15,5
+ana@acme.example,member,,0,0
+ivan@acme.example,member,2026-11-10,33,9

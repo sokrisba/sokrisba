@@ -1,0 +1,3 @@
+person_email,team,tool,seat,active_days,sessions,tokens,window_days
+jane@example.com,Engineering,claude_code,1,18,64,,30
+jane@example.com,Engineering,anthropic_api,0,9,210,41500000,30

@@ -1,0 +1,11 @@
+schema_version: "1.1"
+name: seat-map-from-vendor-exports
+expected_outcome: |
+  A report (markdown) with a seat map per tool, adoption rate per tool and per
+  team, intensity tiers, breadth per team, a dormant-seat list with reclaimable
+  annual cost, API token usage kept separate from seat-product activity and
+  attributed to keys or teams rather than invented people, and a limitations
+  section that says usage is an input and does not prove productivity. The
+  contractor who left (pat) is flagged as a reclaimable seat.
+context:
+  scaffold_script: place-files.sh

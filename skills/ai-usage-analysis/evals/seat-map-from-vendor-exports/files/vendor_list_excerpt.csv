@@ -1,0 +1,5 @@
+Tool,Vendor,Billing model,Seats purchased,Price per seat USD/yr,Annual spend USD,Admin
+Claude.ai Team,Anthropic,seat,14,300,4200,noa@acme.example
+Anthropic Console,Anthropic,token,,,approx 6000 run-rate,dana@acme.example
+ChatGPT Team,OpenAI,seat,10,300,3000,noa@acme.example
+Cursor,Cursor,seat,6,480,2880,dana@acme.example

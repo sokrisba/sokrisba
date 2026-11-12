@@ -1,0 +1,14 @@
+Email,Role,Status,Last active,Active days (30d),Conversations (30d),Claude Code sessions (30d)
+ana@acme.example,member,active,2026-11-10,19,88,41
+ben@acme.example,member,active,2026-11-11,22,40,120
+chen@acme.example,member,active,2026-10-02,2,5,0
+dana@acme.example,admin,active,2026-11-09,11,30,3
+eli@acme.example,member,active,,0,0,0
+fay@acme.example,member,active,2026-11-11,14,35,22
+gus@acme.example,member,active,2026-11-08,9,25,0
+ivan@acme.example,member,active,2026-11-11,16,60,0
+kim@acme.example,member,active,2026-11-10,20,95,0
+mia@acme.example,member,active,,0,0,0
+noa@acme.example,admin,active,2026-11-11,18,70,0
+omar@acme.example,member,active,2026-11-05,4,8,0
+pat@acme.example,member,active,,0,0,0

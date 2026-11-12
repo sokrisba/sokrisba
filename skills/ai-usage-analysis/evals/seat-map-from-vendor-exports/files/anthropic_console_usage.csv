@@ -1,0 +1,5 @@
+Workspace,API key name,Model,Requests,Input tokens,Output tokens,Cache read tokens,Cost USD
+prod-backend,svc-summariser,claude-haiku-5-5,48000,210000000,19000000,80000000,310.0
+research,chen-experiments,claude-opus-5-5,900,88000000,6500000,12000000,1420.0
+research,ben-agent-eval,claude-opus-5-5,2600,310000000,21000000,150000000,3900.0
+research,ben-agent-eval,claude-sonnet-5-5,4100,95000000,9000000,30000000,420.0
