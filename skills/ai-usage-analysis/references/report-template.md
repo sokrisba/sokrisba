@@ -3,6 +3,9 @@
 Use this order. The reader is a finance or operations leader who will forward
 the document without reading the appendix, so the first page must stand on
 its own. Every figure sits in a table; prose carries the interpretation.
+Drop the sections that are out of scope for the request (see "Scope the
+deliverable" in SKILL.md) and say so in one line of the summary; an empty
+section headed "not covered" wastes the reader's first page.
 
 ```
 # AI seat and usage review, <window start> to <window end>

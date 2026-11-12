@@ -68,7 +68,9 @@ where everyone has one tool and it is the one they were given suggests the
 rollout was a push, not a pull. Breadth also exposes overlap: paying for two
 chat assistants per person is a consolidation candidate.
 
-Count bundled tools (Gemini in Workspace) in breadth but not in cost.
+Count bundled tools (Gemini in Workspace) in breadth but not in cost. Count
+Claude Code in breadth as its own tool, since it is a different way of
+working, but never as a seat: it comes with the Claude.ai seat.
 
 ## Output measures (team level only)
 
@@ -105,6 +107,18 @@ These are not usage metrics. Keep them in a separate section of the report.
 - Confounders to list by name: headcount changes, product launches or
   freezes, quarter-end effects, process changes (new review policy, new CRM
   stages), and tool changes unrelated to AI.
+- Robustness checks, both cheap and both worth a line in the report:
+  - Seasonality: look at the monthly series. If the before window holds a
+    holiday month (December, August) re-base on the surrounding months and
+    report the headline as a range. A same-season baseline (this November to
+    December against last November to December) removes the problem outright
+    when the history exists.
+  - Staggered rollout: where seats arrived over several weeks, compare seated
+    and not-yet-seated people within the same month. If both groups move
+    together, the change is calendar-driven (a process or product change)
+    rather than seat-driven, and the report must say so.
+  - Also show the per-person direction count (how many of the people present
+    in both windows moved the same way), without names.
 - Weighting: say what share of the role the measured task covers. For an
   engineer, PR throughput is a large part; for a sales lead, deals created is
   a small part of a quarter dominated by a few late-stage conversations. The

@@ -33,7 +33,9 @@ drift between vendor releases; match on meaning, not exact header text.
 - Normalise: `tool = claude_ai`, `sessions = conversations` (or messages if
   that is all there is; say which), `tokens` blank.
 - Claude Code: treat as a separate `tool = claude_code` row when the export
-  breaks it out, because engineering adoption usually hides there.
+  breaks it out, because engineering adoption usually hides there. It shares
+  the Claude.ai seat, so leave the script's default feature mapping in place
+  and it will not be counted as a second seat.
 
 ### Anthropic Console (API, token-billed)
 

@@ -38,11 +38,28 @@ embarrass yourself in front of finance.
   session alongside raw tokens so the reader can see it.
 - Activity is an input. "More with less" needs an output next to it.
 
+## Scope the deliverable to the question
+
+Not every request is the full review. Match the output to what was asked:
+
+- **Methodology only** ("explain how we'll measure it", "set expectations
+  with finance before we pull numbers"): write a short note from the method
+  paragraph above, the definitions in `references/metrics.md` and the caveats
+  below. Do not run the workflow or invent figures. Spend figures from Notion
+  may be quoted if dated ("USD 5,700 per year as recorded in Notion on
+  2026-03-30"), otherwise leave them out.
+- **Seat map and usage only**: steps 1 to 4 and report sections 1 to 5, 7, 8.
+- **Output only** ("do the more-with-less bit", "before and after for
+  engineering"): step 5 and report sections 1, 6, 7, 8. Say in one line that
+  the usage lenses were not in scope; do not pad the report with empty
+  sections.
+- **Full review**: everything.
+
 ## Workflow
 
 Work through these steps in order. Steps 1 to 3 build the seat map, 4 scores
 it, 5 adds output, 6 writes it up. Skip a step only when the user has already
-supplied its result.
+supplied its result or it is out of scope as above.
 
 ### 1. Establish the tool inventory and seat counts
 
@@ -92,8 +109,12 @@ person_email, team, tool, seat, active_days, sessions, tokens, window_days
 `seat` is 1 if the person had a seat for the whole window. `tokens` is blank
 for seat products. `sessions` means whatever the vendor's nearest concept is
 (conversations, messages, Claude Code sessions, Cursor requests); say which in
-the report. `references/data-sources.md` maps each vendor's export columns to
-this schema and lists the gaps.
+the report. Claude Code is a feature of the Claude.ai seat, not a seat of its
+own: give it its own `tool = claude_code` row so it shows in breadth and
+intensity, and the script (via its default `--feature claude_code=claude_ai`)
+will not count it as a second seat or a second dormant seat.
+`references/data-sources.md` maps each vendor's export columns to this schema
+and lists the gaps.
 
 ### 4. Score adoption, intensity and breadth
 
@@ -135,8 +156,8 @@ already has it:
   for an AI-attribution field; if none exists, say so and propose one rather
   than inferring attribution.
 
-Define a cutover date per team (first month most of the team held a seat) and
-compare equal windows before and after with the script:
+Define a cutover date per team (the first month in which at least half the
+team held a seat) and compare equal windows before and after with the script:
 
 ```bash
 python3 scripts/ai_usage.py prepost events.csv --cutover 2026-03-01 --people people.csv --window-days 90 --out-dir out/
@@ -144,7 +165,10 @@ python3 scripts/ai_usage.py prepost events.csv --cutover 2026-03-01 --people peo
 
 Report medians for cycle time, counts per person-month for throughput, and the
 number of people in each window. Pass the people file so joiners and leavers
-are prorated rather than counted as whole people. A team with fewer than five people in either
+are prorated rather than counted as whole people. Then run the two cheap
+robustness checks in `references/metrics.md` (seasonality in the before
+window, and seated versus not-yet-seated people in the same month when the
+rollout was staggered) and report the headline as a range if they move it. A team with fewer than five people in either
 window gets a direction, not a percentage.
 
 ### 6. Write the report

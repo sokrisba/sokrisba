@@ -4,6 +4,11 @@
 Subcommands
   score    usage.csv [--people people.csv] [--out-dir DIR] [--window-days N]
            [--power 0.6] [--regular 0.25] [--working-day-ratio 0.714]
+           [--feature claude_code=claude_ai ...]
+           --feature marks a tool that is a feature of another tool's seat
+           (default: claude_code=claude_ai). Feature rows count for breadth
+           and intensity but never as seats of their own, so they cannot
+           inflate seat-holder or dormant counts.
   prepost  events.csv --cutover YYYY-MM-DD | --cutover-file cutovers.csv
            [--people people.csv] [--window-days 90] [--ramp-days 30]
            [--min-people 5] [--out-dir DIR]
@@ -118,6 +123,16 @@ def cmd_score(a):
             rec["has_tokens"] = True
 
     working = lambda wd: max(1.0, wd * a.working_day_ratio)
+    features = {}
+    for f in a.feature or []:
+        if "=" in f:
+            child, parent = f.split("=", 1)
+            features[child.strip().lower()] = parent.strip().lower()
+    # a feature row never carries a seat of its own
+    for (email, tool), rec in per.items():
+        if tool in features:
+            rec["seat"] = False
+            rec["feature_of"] = features[tool]
 
     def tier(share, seat):
         if share >= a.power:
@@ -141,9 +156,9 @@ def cmd_score(a):
             p["any_seat"] = True
         if active:
             p["active_tools"].add(tool)
-            if not rec["seat"]:
+            if not rec["seat"] and tool not in features:
                 p["active_without_seat"].add(tool)
-        share = rec["active_days"] / working(rec["window_days"])
+        share = min(1.0, rec["active_days"] / working(rec["window_days"]))
         if share > p["best_share"]:
             p["best_share"], p["best_tool"] = share, tool
         p["sessions"] += rec["sessions"]
@@ -171,17 +186,27 @@ def cmd_score(a):
     tools = sorted({t for (_, t) in per})
     for t in tools:
         recs = [r for (_, tt), r in per.items() if tt == t]
-        seats = [r for r in recs if r["seat"]]
-        active_seats = [r for r in seats if r["active_days"] > 0]
-        dormant = [r for r in seats if r["active_days"] == 0]
-        no_seat_active = [r for r in recs if not r["seat"] and r["active_days"] > 0]
-        shares = [r["active_days"] / working(r["window_days"]) for r in active_seats]
+        if t in features:
+            # seats belong to the parent tool; adoption = parent seat holders using the feature
+            parent_seats = {e for (e, tt), r in per.items() if tt == features[t] and r["seat"]}
+            seats = [r for r in recs if r["email"] in parent_seats]
+            active_seats = [r for r in seats if r["active_days"] > 0]
+            dormant, no_seat_active = [], []
+            label = f"{t} (feature of {features[t]})"
+        else:
+            seats = [r for r in recs if r["seat"]]
+            active_seats = [r for r in seats if r["active_days"] > 0]
+            dormant = [r for r in seats if r["active_days"] == 0]
+            no_seat_active = [r for r in recs if not r["seat"] and r["active_days"] > 0]
+            label = t
+        shares = [min(1.0, r["active_days"] / working(r["window_days"])) for r in active_seats]
         tok = [r for r in recs if r["has_tokens"]]
         tokens = sum(r["tokens"] for r in tok)
         sess = sum(r["sessions"] for r in recs)
         tool_rows.append([
-            t, len(seats), len(active_seats), pct(len(active_seats), len(seats)), len(dormant),
-            len(no_seat_active), f"{statistics.median(shares):.2f}" if shares else "n/a",
+            label, len(seats), len(active_seats), pct(len(active_seats), len(seats)),
+            "n/a" if t in features else len(dormant),
+            "n/a" if t in features else len(no_seat_active), f"{statistics.median(shares):.2f}" if shares else "n/a",
             int(sess), f"{tokens / 1e6:.2f}" if tok else "",
             f"{tokens / sess:,.0f}" if tok and sess else "",
             ";".join(sorted(r["email"] for r in dormant)),
@@ -225,7 +250,8 @@ def cmd_score(a):
         "# AI usage scoring",
         "",
         f"Window: {a.window_days} days (per row where given); working days = {a.working_day_ratio:.3f} x calendar days.",
-        f"Tiers by active-day share on most-used tool: Power >= {a.power:.0%}, Regular >= {a.regular:.0%}, Light > 0, Dormant = 0 with seat.",
+        f"Tiers by active-day share on most-used tool: Power >= {a.power:.0%}, Regular >= {a.regular:.0%}, Light > 0, Dormant = 0 with seat. Share is capped at 1.0.",
+        ("Feature tools (" + ", ".join(f"{c} within {p}" for c, p in features.items()) + ") count for breadth and intensity but not as seats; their adoption rate is the share of parent seat holders using the feature.") if features else "",
         f"People with a seat on any tool: {total_seated}; active on at least one: {total_active} ({pct(total_active, total_seated)}).",
         "",
         "## Per tool", "",
@@ -368,6 +394,8 @@ def main():
     s.add_argument("--power", type=float, default=0.60)
     s.add_argument("--regular", type=float, default=0.25)
     s.add_argument("--working-day-ratio", type=float, default=5 / 7)
+    s.add_argument("--feature", action="append", default=["claude_code=claude_ai"],
+                   help="child=parent; child tool is a feature of the parent's seat (repeatable)")
     s.set_defaults(fn=cmd_score)
 
     p = sub.add_parser("prepost", help="team-level output before and after a cutover")
